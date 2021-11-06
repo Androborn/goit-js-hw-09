@@ -1,10 +1,43 @@
+import Notiflix from 'notiflix';
+
+const refs = {
+  form: document.querySelector('.form'),
+};
+
+refs.form.addEventListener('submit', counter);
+
+function counter(e) {
+  e.preventDefault();
+
+  let delaySum = Number(e.currentTarget.delay.value);
+
+  for (let i = 1; i <= e.currentTarget.amount.value; i += 1) {
+    createPromise(i, delaySum);
+    delaySum += Number(e.currentTarget.step.value);
+  }
+}
+
 function createPromise(position, delay) {
   const shouldResolve = Math.random() > 0.3;
-  if (shouldResolve) {
-    // Fulfill
-  } else {
-    // Reject
-  }
+  const values = { position, delay };
+
+  const promise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (shouldResolve) {
+        resolve(values);
+      } else {
+        reject(values);
+      }
+    }, delay);
+  });
+
+  promise
+    .then(({ position, delay }) => {
+      Notiflix.Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
+    })
+    .catch(({ position, delay }) => {
+      Notiflix.Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
+    });
 }
 
 // В HTML есть разметка формы, в поля которой пользователь будет вводить первую задержку в миллисекундах, шаг увеличения задержки для каждого промиса после первого и количество промисов которое необходимо создать.
