@@ -41,16 +41,24 @@ import Notiflix from 'notiflix';
 
 const refs = {
   startBtn: document.querySelector('button[data-start]'),
+  datePicker: document.querySelector('#datetime-picker'),
   daysCount: document.querySelector('.value[data-days]'),
   hoursCount: document.querySelector('.value[data-hours]'),
   minutesCount: document.querySelector('.value[data-minutes]'),
   secondsCount: document.querySelector('.value[data-seconds]'),
-
-  datePicker: document.querySelector('#datetime-picker'),
 };
+const {
+  startBtn,
+  datePicker,
+  daysCount,
+  hoursCount,
+  minutesCount,
+  secondsCount,
+} = refs;
 
-let selectedDate = {};
-let timer = null;
+let selectedDate = null;
+let remainTime = null;
+let countdown = null;
 
 const options = {
   enableTime: true,
@@ -61,47 +69,50 @@ const options = {
     if (selectedDates[0] < Date.now()) {
       preventDateBeforeNow();
     } else {
-      refs.startBtn.disabled = false;
+      startBtn.disabled = false;
       selectedDate = selectedDates[0];
     }
   },
 };
 
-refs.startBtn.disabled = true;
-
-refs.startBtn.addEventListener('click', startCountdown);
-
 flatpickr('#datetime-picker', options);
+
+startBtn.disabled = true;
+startBtn.addEventListener('click', startCountdown);
 
 function preventDateBeforeNow() {
   Notiflix.Notify.failure('Please choose a date in the future');
 }
 
 function startCountdown() {
-  refs.startBtn.disabled = true;
-  refs.datePicker.disabled = true;
+  startBtn.disabled = true;
+  datePicker.disabled = true;
 
-  setCounterUi();
+  countdown = setInterval(updateCounter, 1000);
 
-  timer = setInterval(setCounterUi, 1000);
+  updateCounter();
 }
 
-function setCounterUi() {
-  finishCoountdown();
+function updateCounter() {
+  remainTime = selectedDate - Date.now();
 
-  refs.daysCount.textContent = convertMs(selectedDate - Date.now()).days;
-  refs.hoursCount.textContent = convertMs(selectedDate - Date.now()).hours;
-  refs.minutesCount.textContent = convertMs(selectedDate - Date.now()).minutes;
-  refs.secondsCount.textContent = convertMs(selectedDate - Date.now()).seconds;
+  updateCounterUi();
+  finishCoountdown();
+}
+
+function updateCounterUi() {
+  daysCount.textContent = convertMs(remainTime).days;
+  hoursCount.textContent = convertMs(remainTime).hours;
+  minutesCount.textContent = convertMs(remainTime).minutes;
+  secondsCount.textContent = convertMs(remainTime).seconds;
 }
 
 function finishCoountdown() {
-  if (convertMs(selectedDate - Date.now()).seconds === '00') {
-    clearInterval(timer);
+  if (remainTime < 1000) {
+    clearInterval(countdown);
   }
 }
 
-// --------------
 function convertMs(ms) {
   const second = 1000;
   const minute = second * 60;
