@@ -1,0 +1,17 @@
+.button-wrapper {
+  display: flex;
+  height: 80vh;
+  justify-content: center;
+}
+
+button {
+  font-size: 30px;
+  font-weight: bold;
+
+  padding: 10px;
+  margin: auto 0;
+}
+
+button:not(:last-child) {
+  margin-right: 20px;
+}
