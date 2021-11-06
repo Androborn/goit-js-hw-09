@@ -1,19 +1,32 @@
+// В HTML есть разметка формы, в поля которой пользователь будет вводить первую задержку в миллисекундах, шаг увеличения задержки для каждого промиса после первого и количество промисов которое необходимо создать.
+
+// Напиши скрипт, который при сабмите формы вызывает функцию createPromise(position, delay) столько раз, сколько ввели в поле amount. При каждом вызове передай ей номер создаваемого промиса (position) и задержку учитывая введенную пользователем первую задержку (delay) и шаг (step).
+
+// Дополни код функции createPromise так, чтобы она возвращала один промис, который выполянется или отклоняется через delay времени. Значением промиса должен быть объект, в котором будут свойства position и delay со значениями одноименных параметров. Используй начальный код функции для выбора того, что нужно сделать с промисом - выполнить или отклонить.
+
+// Библиотека уведомлений
+// ⚠️ Следующий функционал не обязателен при сдаче задания, но будет хорошей дополнительной практикой.
+
+// Для отображения уведомлений пользователю вместо console.log() используй библиотеку notiflix.
+
 import Notiflix from 'notiflix';
 
-const refs = {
-  form: document.querySelector('.form'),
-};
+const form = document.querySelector('.form');
 
-refs.form.addEventListener('submit', counter);
+form.addEventListener('submit', startGenerator);
 
-function counter(e) {
+function startGenerator(e) {
   e.preventDefault();
 
-  let delaySum = Number(e.currentTarget.delay.value);
+  let delay = Number(e.currentTarget.delay.value);
 
-  for (let i = 1; i <= e.currentTarget.amount.value; i += 1) {
-    createPromise(i, delaySum);
-    delaySum += Number(e.currentTarget.step.value);
+  for (
+    let position = 1;
+    position <= e.currentTarget.amount.value;
+    position += 1
+  ) {
+    createPromise(position, delay);
+    delay += Number(e.currentTarget.step.value);
   }
 }
 
@@ -39,14 +52,3 @@ function createPromise(position, delay) {
       Notiflix.Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
     });
 }
-
-// В HTML есть разметка формы, в поля которой пользователь будет вводить первую задержку в миллисекундах, шаг увеличения задержки для каждого промиса после первого и количество промисов которое необходимо создать.
-
-// Напиши скрипт, который при сабмите формы вызывает функцию createPromise(position, delay) столько раз, сколько ввели в поле amount. При каждом вызове передай ей номер создаваемого промиса (position) и задержку учитывая введенную пользователем первую задержку (delay) и шаг (step).
-
-// Дополни код функции createPromise так, чтобы она возвращала один промис, который выполянется или отклоняется через delay времени. Значением промиса должен быть объект, в котором будут свойства position и delay со значениями одноименных параметров. Используй начальный код функции для выбора того, что нужно сделать с промисом - выполнить или отклонить.
-
-// Библиотека уведомлений
-// ⚠️ Следующий функционал не обязателен при сдаче задания, но будет хорошей дополнительной практикой.
-
-// Для отображения уведомлений пользователю вместо console.log() используй библиотеку notiflix.
