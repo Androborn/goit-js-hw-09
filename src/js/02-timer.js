@@ -35,6 +35,108 @@
 
 // Для отображения уведомлений пользователю вместо window.alert() используй библиотеку notiflix.
 
+// v1-(let remainTime global & func onClose in options)-------------------
+// import flatpickr from 'flatpickr';
+// import 'flatpickr/dist/flatpickr.min.css';
+// import Notiflix from 'notiflix';
+
+// const refs = {
+//   startBtn: document.querySelector('button[data-start]'),
+//   datePicker: document.querySelector('#datetime-picker'),
+//   daysCount: document.querySelector('.value[data-days]'),
+//   hoursCount: document.querySelector('.value[data-hours]'),
+//   minutesCount: document.querySelector('.value[data-minutes]'),
+//   secondsCount: document.querySelector('.value[data-seconds]'),
+// };
+// const {
+//   startBtn,
+//   datePicker,
+//   daysCount,
+//   hoursCount,
+//   minutesCount,
+//   secondsCount,
+// } = refs;
+
+// let selectedDate = null;
+// let remainTime = null;
+// let countdown = null;
+
+// const options = {
+//   enableTime: true,
+//   time_24hr: true,
+//   defaultDate: Date.now(),
+//   minuteIncrement: 1,
+//   onClose,
+// };
+
+// flatpickr('#datetime-picker', options);
+
+// startBtn.disabled = true;
+// startBtn.addEventListener('click', startCountdown);
+
+// function onClose(selectedDates) {
+//   if (selectedDates[0] < Date.now()) {
+//     preventDateBeforeNow();
+//   } else {
+//     startBtn.disabled = false;
+//     selectedDate = selectedDates[0];
+//   }
+// }
+
+// function preventDateBeforeNow() {
+//   Notiflix.Notify.failure('Please choose a date in the future');
+// }
+
+// function startCountdown() {
+//   startBtn.disabled = true;
+//   datePicker.disabled = true;
+
+//   countdown = setInterval(updateCounter, 1000);
+
+//   updateCounter();
+// }
+
+// function updateCounter() {
+//   remainTime = selectedDate - Date.now();
+
+//   updateCounterUi();
+//   finishCoountdown();
+// }
+
+// function updateCounterUi() {
+//   daysCount.textContent = convertMs(remainTime).days;
+//   hoursCount.textContent = convertMs(remainTime).hours;
+//   minutesCount.textContent = convertMs(remainTime).minutes;
+//   secondsCount.textContent = convertMs(remainTime).seconds;
+// }
+
+// function finishCoountdown() {
+//   if (remainTime < 1000) {
+//     clearInterval(countdown);
+//   }
+// }
+
+// function convertMs(ms) {
+//   const second = 1000;
+//   const minute = second * 60;
+//   const hour = minute * 60;
+//   const day = hour * 24;
+
+//   const days = addLeadingZero(Math.floor(ms / day));
+//   const hours = addLeadingZero(Math.floor((ms % day) / hour));
+//   const minutes = addLeadingZero(Math.floor(((ms % day) % hour) / minute));
+//   const seconds = addLeadingZero(
+//     Math.floor((((ms % day) % hour) % minute) / second),
+//   );
+
+//   return { days, hours, minutes, seconds };
+// }
+
+// function addLeadingZero(value) {
+//   return String(value).padStart(2, '0');
+// }
+
+// v2-(more autonomous?)--------------------------------------
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import Notiflix from 'notiflix';
@@ -56,29 +158,30 @@ const {
   secondsCount,
 } = refs;
 
-let selectedDate = null;
-let remainTime = null;
-let countdown = null;
-
 const options = {
   enableTime: true,
   time_24hr: true,
   defaultDate: Date.now(),
   minuteIncrement: 1,
-  onClose(selectedDates) {
-    if (selectedDates[0] < Date.now()) {
-      preventDateBeforeNow();
-    } else {
-      startBtn.disabled = false;
-      selectedDate = selectedDates[0];
-    }
-  },
+  onClose,
 };
+
+let selectedDate = null;
+let countdown = null;
 
 flatpickr('#datetime-picker', options);
 
 startBtn.disabled = true;
 startBtn.addEventListener('click', startCountdown);
+
+function onClose(selectedDates) {
+  if (selectedDates[0] < Date.now()) {
+    preventDateBeforeNow();
+  } else {
+    startBtn.disabled = false;
+    selectedDate = selectedDates[0];
+  }
+}
 
 function preventDateBeforeNow() {
   Notiflix.Notify.failure('Please choose a date in the future');
@@ -94,20 +197,20 @@ function startCountdown() {
 }
 
 function updateCounter() {
-  remainTime = selectedDate - Date.now();
+  let remainTime = selectedDate - Date.now();
 
-  updateCounterUi();
-  finishCoountdown();
+  updateCounterUi(remainTime);
+  finishCoountdown(remainTime);
 }
 
-function updateCounterUi() {
+function updateCounterUi(remainTime) {
   daysCount.textContent = convertMs(remainTime).days;
   hoursCount.textContent = convertMs(remainTime).hours;
   minutesCount.textContent = convertMs(remainTime).minutes;
   secondsCount.textContent = convertMs(remainTime).seconds;
 }
 
-function finishCoountdown() {
+function finishCoountdown(remainTime) {
   if (remainTime < 1000) {
     clearInterval(countdown);
   }
