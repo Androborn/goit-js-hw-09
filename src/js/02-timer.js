@@ -136,7 +136,7 @@
 //   return String(value).padStart(2, '0');
 // }
 
-// v2-(more autonomous?)--------------------------------------
+// v2-(more autonomous? + can do callbacks in updateCounter?)-------------------
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import Notiflix from 'notiflix';
@@ -166,7 +166,7 @@ const options = {
   onClose,
 };
 
-let selectedDate = null;
+let userDate = null;
 let countdown = null;
 
 flatpickr('#datetime-picker', options);
@@ -178,8 +178,7 @@ function onClose(selectedDates) {
   if (selectedDates[0] < Date.now()) {
     preventDateBeforeNow();
   } else {
-    startBtn.disabled = false;
-    selectedDate = selectedDates[0];
+    enableCountdownStart(selectedDates[0]);
   }
 }
 
@@ -187,17 +186,28 @@ function preventDateBeforeNow() {
   Notiflix.Notify.failure('Please choose a date in the future');
 }
 
+function enableCountdownStart(selectedDate) {
+  startBtn.disabled = false;
+  userDate = selectedDate;
+}
+
 function startCountdown() {
-  startBtn.disabled = true;
-  datePicker.disabled = true;
-
-  countdown = setInterval(updateCounter, 1000);
-
+  disableCountdownStart();
+  setCountdown();
   updateCounter();
 }
 
+function disableCountdownStart() {
+  startBtn.disabled = true;
+  datePicker.disabled = true;
+}
+
+function setCountdown() {
+  countdown = setInterval(updateCounter, 1000);
+}
+
 function updateCounter() {
-  let remainTime = selectedDate - Date.now();
+  let remainTime = userDate - Date.now();
 
   updateCounterUi(remainTime);
   finishCoountdown(remainTime);

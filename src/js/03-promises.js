@@ -52,40 +52,95 @@
 // }
 
 // v2-(shorter & more readable?)--------------------------
+// import Notiflix from 'notiflix';
+
+// const form = document.querySelector('.form');
+
+// form.addEventListener('submit', startGenerator);
+
+// function startGenerator(e) {
+//   e.preventDefault();
+
+//   let { delay, amount, step } = form;
+//   delay = +delay.value;
+
+//   for (let position = 1; position <= amount.value; position += 1) {
+//     createPromise(position, delay);
+//     delay += +step.value;
+//   }
+// }
+
+// function createPromise(position, delay) {
+//   const shouldResolve = Math.random() > 0.3;
+
+//   new Promise((resolve, reject) => {
+//     setTimeout(() => {
+//       if (shouldResolve) {
+//         resolve();
+//       } else {
+//         reject();
+//       }
+//     }, delay);
+//   })
+//     .then(() => {
+//       Notiflix.Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
+//     })
+//     .catch(() => {
+//       Notiflix.Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
+//     });
+// }
+
+// v3-(deep disassambly?)--------------------------
 import Notiflix from 'notiflix';
 
 const form = document.querySelector('.form');
+let { delay, step, amount } = form;
 
 form.addEventListener('submit', startGenerator);
 
 function startGenerator(e) {
   e.preventDefault();
 
-  let { delay, amount, step } = form;
-  delay = +delay.value;
+  generatePromises();
+}
 
-  for (let position = 1; position <= amount.value; position += 1) {
-    createPromise(position, delay);
-    delay += +step.value;
+function generatePromises() {
+  let timeoutDelay = +delay.value;
+  let timeoutDelayStep = +step.value;
+  let promisesQuantity = +amount.value;
+
+  for (let position = 1; position <= promisesQuantity; position += 1) {
+    let values = { position, timeoutDelay };
+
+    createPromise(values).then(resolveSuccess).catch(resolveError);
+    timeoutDelay += timeoutDelayStep;
   }
 }
 
-function createPromise(position, delay) {
-  const shouldResolve = Math.random() > 0.3;
-
-  new Promise((resolve, reject) => {
+function createPromise(values) {
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (shouldResolve) {
-        resolve();
+      if (generateResolve()) {
+        resolve(values);
       } else {
-        reject();
+        reject(values);
       }
-    }, delay);
-  })
-    .then(() => {
-      Notiflix.Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
-    })
-    .catch(() => {
-      Notiflix.Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
-    });
+    }, values.timeoutDelay);
+  });
+}
+
+function generateResolve() {
+  return Math.random() > 0.3;
+}
+
+function resolveSuccess({ position, timeoutDelay }) {
+  Notiflix.Notify.success(
+    `✅ Fulfilled promise ${position} in ${timeoutDelay}ms`,
+  );
+}
+
+function resolveError({ position, timeoutDelay }) {
+  Notiflix.Notify.failure(
+    `❌ Rejected promise ${position} in ${timeoutDelay}ms`,
+  );
 }
